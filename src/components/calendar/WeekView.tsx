@@ -11,12 +11,12 @@ interface WeekViewProps {
 
 const WeekView = ({ weekDays, selectedDate, onSelectDate, getTasksForDate }: WeekViewProps) => {
   return (
-    <div className="bg-white/40 backdrop-blur-sm rounded-2xl p-6 shadow-soft">
-      <h3 className="text-lg font-semibold text-foreground mb-4">
+    <div className="bg-white/40 backdrop-blur-sm rounded-2xl p-4 sm:p-6 shadow-soft">
+      <h3 className="text-base sm:text-lg font-semibold text-foreground mb-4">
         Semana de {format(weekDays[0], 'dd MMM', { locale: es })}
       </h3>
       
-      <div className="grid grid-cols-7 gap-2">
+      <div className="grid grid-cols-7 gap-1 sm:gap-2 lg:gap-3">
         {weekDays.map((day, index) => {
           const dayTasks = getTasksForDate(day);
           const completedTasks = dayTasks.filter(task => task.completed);
@@ -27,7 +27,7 @@ const WeekView = ({ weekDays, selectedDate, onSelectDate, getTasksForDate }: Wee
             <div
               key={index}
               onClick={() => onSelectDate(day)}
-              className={`p-3 rounded-xl cursor-pointer transition-all duration-300 hover:scale-105
+              className={`p-2 sm:p-3 lg:p-4 rounded-xl cursor-pointer transition-all duration-300 hover:scale-105
                 ${isSelected 
                   ? 'bg-gradient-primary text-white shadow-pastel' 
                   : isCurrentDay
@@ -36,14 +36,14 @@ const WeekView = ({ weekDays, selectedDate, onSelectDate, getTasksForDate }: Wee
                 }`}
             >
               {/* Day Name */}
-              <div className={`text-xs font-medium text-center mb-2 
+              <div className={`text-[10px] sm:text-xs font-medium text-center mb-1 sm:mb-2 
                 ${isSelected ? 'text-white/80' : 'text-muted-foreground'}
               `}>
                 {format(day, 'EEE', { locale: es }).toUpperCase()}
               </div>
               
               {/* Day Number */}
-              <div className={`text-lg font-bold text-center mb-2
+              <div className={`text-sm sm:text-lg lg:text-xl font-bold text-center mb-1 sm:mb-2
                 ${isSelected ? 'text-white' : 'text-foreground'}
               `}>
                 {format(day, 'd')}

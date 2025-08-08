@@ -35,19 +35,19 @@ const CalendarHeader = ({ selectedDate, view, onNavigate, onViewChange }: Calend
   ];
 
   return (
-    <div className="bg-gradient-soft rounded-2xl p-6 shadow-soft">
+    <div className="bg-gradient-soft rounded-2xl p-4 sm:p-6 shadow-soft">
       {/* Navigation */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4 sm:mb-6">
         <Button
           variant="ghost"
           size="icon"
           onClick={() => onNavigate('prev')}
-          className="h-10 w-10 rounded-full bg-white/50 hover:bg-white/80 transition-smooth"
+          className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-white/50 hover:bg-white/80 transition-smooth"
         >
-          <ChevronLeft className="h-5 w-5" />
+          <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
         </Button>
         
-        <h1 className="text-xl font-semibold text-foreground capitalize">
+        <h1 className="text-lg sm:text-xl lg:text-2xl font-semibold text-foreground capitalize text-center px-2">
           {getFormattedDate()}
         </h1>
         
@@ -55,9 +55,9 @@ const CalendarHeader = ({ selectedDate, view, onNavigate, onViewChange }: Calend
           variant="ghost"
           size="icon"
           onClick={() => onNavigate('next')}
-          className="h-10 w-10 rounded-full bg-white/50 hover:bg-white/80 transition-smooth"
+          className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-white/50 hover:bg-white/80 transition-smooth"
         >
-          <ChevronRight className="h-5 w-5" />
+          <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
         </Button>
       </div>
 
@@ -69,7 +69,7 @@ const CalendarHeader = ({ selectedDate, view, onNavigate, onViewChange }: Calend
             variant={view === key ? "default" : "ghost"}
             size="sm"
             onClick={() => onViewChange(key)}
-            className={`flex-1 rounded-full text-sm font-medium transition-smooth ${
+            className={`flex-1 rounded-full text-xs sm:text-sm font-medium transition-smooth ${
               view === key 
                 ? 'bg-primary text-primary-foreground shadow-soft' 
                 : 'hover:bg-white/60 text-muted-foreground'

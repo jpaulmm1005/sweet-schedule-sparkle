@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { format } from 'date-fns';
-import { Clock, Edit3 } from 'lucide-react';
+import { Clock, Edit3, Trash2 } from 'lucide-react';
 import { Task } from '@/types/calendar';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -101,18 +101,35 @@ const TaskItem = ({ task, onToggle, onUpdate, onDelete, showDate = false }: Task
             </div>
           </div>
 
-          {/* Edit Button (visible on hover) */}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="opacity-0 group-hover:opacity-100 transition-smooth h-8 w-8 p-0"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleLongPress();
-            }}
-          >
-            <Edit3 className="w-3 h-3" />
-          </Button>
+          {/* Action Buttons (visible on hover) */}
+          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-smooth">
+            <Button
+              aria-label="Editar tarea"
+              title="Editar"
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleLongPress();
+              }}
+            >
+              <Edit3 className="w-3 h-3" />
+            </Button>
+            <Button
+              aria-label="Eliminar tarea"
+              title="Eliminar"
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 text-destructive hover:text-destructive/90"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(task.id);
+              }}
+            >
+              <Trash2 className="w-3 h-3" />
+            </Button>
+          </div>
         </div>
       </div>
 

@@ -1,9 +1,9 @@
-import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
-import { Plus } from 'lucide-react';
-import { Task } from '@/types/calendar';
-import { Button } from '@/components/ui/button';
-import TaskItem from './TaskItem';
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
+import { Plus } from "lucide-react";
+import { Task } from "@/types/calendar";
+import { Button } from "@/components/ui/button";
+import TaskItem from "./TaskItem";
 
 interface DayViewProps {
   selectedDate: Date;
@@ -14,13 +14,13 @@ interface DayViewProps {
   onAddTask: () => void;
 }
 
-const DayView = ({ 
-  selectedDate, 
-  tasks, 
-  onToggleTask, 
-  onUpdateTask, 
+const DayView = ({
+  selectedDate,
+  tasks,
+  onToggleTask,
+  onUpdateTask,
   onDeleteTask,
-  onAddTask 
+  onAddTask,
 }: DayViewProps) => {
   const sortedTasks = [...tasks].sort((a, b) => {
     if (!a.time && !b.time) return 0;
@@ -29,7 +29,7 @@ const DayView = ({
     return a.time.localeCompare(b.time);
   });
 
-  const completedCount = tasks.filter(task => task.completed).length;
+  const completedCount = tasks.filter((task) => task.completed).length;
   const totalCount = tasks.length;
 
   return (
@@ -37,26 +37,32 @@ const DayView = ({
       {/* Day Header */}
       <div className="bg-gradient-primary rounded-2xl p-4 sm:p-6 lg:p-8 text-center shadow-pastel">
         <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-2">
-          {format(selectedDate, 'd', { locale: es })}
+          {format(selectedDate, "d", { locale: es })}
         </h2>
         <p className="text-white/80 font-medium text-sm sm:text-base">
-          {format(selectedDate, 'EEEE', { locale: es })}
+          {format(selectedDate, "EEEE", { locale: es })}
         </p>
         <p className="text-white/60 text-xs sm:text-sm mt-1">
-          {format(selectedDate, 'MMMM yyyy', { locale: es })}
+          {format(selectedDate, "MMMM yyyy", { locale: es })}
         </p>
-        
+
         {/* Progress */}
         {totalCount > 0 && (
           <div className="mt-4">
             <div className="flex justify-between text-white/80 text-xs sm:text-sm mb-2">
               <span>Progreso del día</span>
-              <span>{completedCount}/{totalCount}</span>
+              <span>
+                {completedCount}/{totalCount}
+              </span>
             </div>
             <div className="w-full bg-white/20 rounded-full h-2">
-              <div 
+              <div
                 className="bg-white rounded-full h-2 transition-all duration-500"
-                style={{ width: `${totalCount > 0 ? (completedCount / totalCount) * 100 : 0}%` }}
+                style={{
+                  width: `${
+                    totalCount > 0 ? (completedCount / totalCount) * 100 : 0
+                  }%`,
+                }}
               />
             </div>
           </div>
@@ -69,19 +75,21 @@ const DayView = ({
           <h3 className="text-base sm:text-lg font-semibold text-foreground">
             Tareas de hoy
           </h3>
-          <Button
-            onClick={onAddTask}
-            className="bg-primary hover:bg-primary/90 shadow-soft rounded-full h-8 w-8 sm:h-10 sm:w-10 p-0"
-          >
-            <Plus className="h-4 w-4 sm:h-5 sm:w-5" />
-          </Button>
+          {sortedTasks.length > 0 ? (
+            <Button
+              onClick={onAddTask}
+              className="bg-primary hover:bg-primary/90 shadow-soft rounded-full h-8 w-8 sm:h-10 sm:w-10 p-0"
+            >
+              <Plus className="h-4 w-4 sm:h-5 sm:w-5" />
+            </Button>
+          ) : null}
         </div>
 
         {/* Tasks List */}
         <div className="space-y-3 lg:space-y-4">
           {sortedTasks.length > 0 ? (
             <div className="lg:grid lg:grid-cols-2 lg:gap-4 lg:space-y-0 space-y-3">
-              {sortedTasks.map(task => (
+              {sortedTasks.map((task) => (
                 <TaskItem
                   key={task.id}
                   task={task}

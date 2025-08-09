@@ -1,14 +1,15 @@
-import { useState } from 'react';
-import { useCalendar } from '@/hooks/useCalendar';
-import CalendarHeader from './CalendarHeader';
-import DayView from './DayView';
-import WeekView from './WeekView';
-import MonthView from './MonthView';
-import AddTaskDialog from './AddTaskDialog';
+import { useState } from "react";
+import { useCalendar } from "@/hooks/useCalendar";
+import CalendarHeader from "./CalendarHeader";
+import DayView from "./DayView";
+import WeekView from "./WeekView";
+import MonthView from "./MonthView";
+import YearView from "./YearView";
+import AddTaskDialog from "./AddTaskDialog";
 
 const CalendarApp = () => {
   const [showAddTask, setShowAddTask] = useState(false);
-  
+
   const {
     selectedDate,
     view,
@@ -31,7 +32,7 @@ const CalendarApp = () => {
 
   const renderView = () => {
     switch (view) {
-      case 'day':
+      case "day":
         return (
           <DayView
             selectedDate={selectedDate}
@@ -42,34 +43,47 @@ const CalendarApp = () => {
             onAddTask={handleAddTask}
           />
         );
-      case 'week':
+      case "week":
         return (
           <WeekView
             weekDays={weekDays}
             selectedDate={selectedDate}
             onSelectDate={selectDate}
             getTasksForDate={getTasksForDate}
+            onGoToDayView={(date) => {
+              selectDate(date);
+              setView("day");
+            }}
           />
         );
-      case 'month':
+      case "month":
         return (
           <MonthView
             monthDays={monthDays}
             selectedDate={selectedDate}
             onSelectDate={selectDate}
             getTasksForDate={getTasksForDate}
+            onGoToDayView={(date) => {
+              selectDate(date);
+              setView("day");
+            }}
           />
         );
-      case 'year':
+      case "year":
         return (
-          <div className="bg-white/40 backdrop-blur-sm rounded-2xl p-6 shadow-soft">
-            <h3 className="text-lg font-semibold text-foreground mb-4">
-              Vista Anual - Próximamente
-            </h3>
-            <p className="text-muted-foreground">
-              La vista anual estará disponible en una próxima actualización.
-            </p>
-          </div>
+          <YearView
+            selectedDate={selectedDate}
+            onSelectDate={selectDate}
+            getTasksForDate={getTasksForDate}
+            onGoToDayView={(date) => {
+              selectDate(date);
+              setView("day");
+            }}
+            onGoToMonthView={(date) => {
+              selectDate(date);
+              setView("month");
+            }}
+          />
         );
       default:
         return null;
@@ -88,7 +102,7 @@ const CalendarApp = () => {
               onNavigate={navigateDate}
               onViewChange={setView}
             />
-            
+
             {renderView()}
           </div>
         </div>
@@ -104,16 +118,19 @@ const CalendarApp = () => {
                 onNavigate={navigateDate}
                 onViewChange={setView}
               />
-              
+
               {/* Mini Calendar for Desktop */}
-              {view === 'day' && (
+              {view === "day" && (
                 <div className="bg-white/40 backdrop-blur-sm rounded-2xl p-4 shadow-soft">
-                  <h4 className="text-sm font-semibold text-foreground mb-3">Vista Rápida</h4>
+                  <h4 className="text-sm font-semibold text-foreground mb-3">
+                    Vista Rápida
+                  </h4>
                   <WeekView
                     weekDays={weekDays}
                     selectedDate={selectedDate}
                     onSelectDate={selectDate}
                     getTasksForDate={getTasksForDate}
+                    compact
                   />
                 </div>
               )}

@@ -9,7 +9,7 @@
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
-    "predeploy": "npm run build",
+    "predeploy": "npm run build && powershell -NoProfile -NonInteractive -Command \"Copy-Item -LiteralPath 'dist/index.html' -Destination 'dist/404.html' -Force\"",
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {

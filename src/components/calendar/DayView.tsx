@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef } from "react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Plus } from "lucide-react";
@@ -22,15 +23,56 @@ const DayView = ({
   onDeleteTask,
   onAddTask,
 }: DayViewProps) => {
+  // FLIP animation refs
+  const itemRefs = useRef(new Map<string, HTMLDivElement>());
+  const prevRects = useRef(new Map<string, DOMRect>());
+
+  const weight = (t: Task) =>
+    t.priority === "high" ? 3 : t.priority === "medium" ? 2 : 1;
   const sortedTasks = [...tasks].sort((a, b) => {
+    const wp = weight(b) - weight(a);
+    if (wp !== 0) return wp; // higher priority first
     if (!a.time && !b.time) return 0;
     if (!a.time) return 1;
     if (!b.time) return -1;
     return a.time.localeCompare(b.time);
   });
 
-  const completedCount = tasks.filter((task) => task.completed).length;
-  const totalCount = tasks.length;
+  const totalWeight = tasks.reduce((acc, t) => acc + weight(t), 0);
+  const completedWeight = tasks.reduce(
+    (acc, t) => acc + (t.completed ? weight(t) : 0),
+    0
+  );
+  const progressPct =
+    totalWeight > 0 ? Math.round((completedWeight / totalWeight) * 100) : 0;
+
+  // FLIP animation on reorder
+  const idsKey = sortedTasks.map((t) => t.id).join(",");
+  useLayoutEffect(() => {
+    const newRects = new Map<string, DOMRect>();
+    for (const t of sortedTasks) {
+      const el = itemRefs.current.get(t.id);
+      if (el) newRects.set(t.id, el.getBoundingClientRect());
+    }
+
+    for (const [id, newRect] of newRects) {
+      const el = itemRefs.current.get(id);
+      const prevRect = prevRects.current.get(id);
+      if (!el || !prevRect) continue;
+      const dx = prevRect.left - newRect.left;
+      const dy = prevRect.top - newRect.top;
+      if (dx !== 0 || dy !== 0) {
+        el.style.transform = `translate(${dx}px, ${dy}px)`;
+        el.style.transition = "transform 0s";
+        requestAnimationFrame(() => {
+          el.style.transform = "";
+          el.style.transition = "transform 300ms ease";
+        });
+      }
+    }
+
+    prevRects.current = newRects;
+  }, [idsKey, sortedTasks]);
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -47,22 +89,16 @@ const DayView = ({
         </p>
 
         {/* Progress */}
-        {totalCount > 0 && (
+        {totalWeight > 0 && (
           <div className="mt-4">
             <div className="flex justify-between text-white/80 text-xs sm:text-sm mb-2">
               <span>Progreso del día</span>
-              <span>
-                {completedCount}/{totalCount}
-              </span>
+              <span>{progressPct}%</span>
             </div>
             <div className="w-full bg-white/20 rounded-full h-2">
               <div
                 className="bg-white rounded-full h-2 transition-all duration-500"
-                style={{
-                  width: `${
-                    totalCount > 0 ? (completedCount / totalCount) * 100 : 0
-                  }%`,
-                }}
+                style={{ width: `${progressPct}%` }}
               />
             </div>
           </div>
@@ -88,32 +124,41 @@ const DayView = ({
         {/* Tasks List */}
         <div className="space-y-3 lg:space-y-4">
           {sortedTasks.length > 0 ? (
-            <div className="lg:grid lg:grid-cols-2 lg:gap-4 lg:space-y-0 space-y-3">
+            <div className="lg:grid lg:grid-cols-2 lg:gap-4 lg:space-y-0 space-y-3 lg:auto-rows-fr">
               {sortedTasks.map((task) => (
-                <TaskItem
+                <div
                   key={task.id}
-                  task={task}
-                  onToggle={onToggleTask}
-                  onUpdate={onUpdateTask}
-                  onDelete={onDeleteTask}
-                />
+                  ref={(el) => {
+                    if (el) itemRefs.current.set(task.id, el);
+                    else itemRefs.current.delete(task.id);
+                  }}
+                  className="will-change-transform h-full"
+                >
+                  <TaskItem
+                    task={task}
+                    onToggle={onToggleTask}
+                    onUpdate={onUpdateTask}
+                    onDelete={onDeleteTask}
+                  />
+                </div>
               ))}
             </div>
           ) : (
             <div className="text-center py-6 sm:py-8">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-soft rounded-full flex items-center justify-center mx-auto mb-4">
-                <Plus className="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground" />
+              <div>
+                <Button
+                  onClick={onAddTask}
+                  className="bg-primary hover:bg-primary/90 shadow-soft rounded-full h-10 w-10 p-0"
+                  aria-label="Agregar tarea"
+                  title="Agregar tarea"
+                >
+                  <Plus className="h-5 w-5 text-white" />
+                </Button>
               </div>
-              <p className="text-muted-foreground text-sm">
+              <p className="text-muted-foreground text-sm mt-5">
                 No tienes tareas para hoy
               </p>
-              <Button
-                onClick={onAddTask}
-                variant="ghost"
-                className="mt-2 text-primary hover:text-primary/80"
-              >
-                Agregar tu primera tarea
-              </Button>
+              <p className="text-primary">Agregar tu primera tarea</p>
             </div>
           )}
         </div>

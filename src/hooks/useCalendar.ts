@@ -26,6 +26,7 @@ const mockTasks: Task[] = [
     date: format(new Date(), "yyyy-MM-dd"),
     time: "08:00",
     completed: false,
+    priority: "medium",
     createdAt: new Date(),
     updatedAt: new Date(),
   },
@@ -36,6 +37,7 @@ const mockTasks: Task[] = [
     date: format(new Date(), "yyyy-MM-dd"),
     time: "11:00",
     completed: true,
+    priority: "high",
     createdAt: new Date(),
     updatedAt: new Date(),
   },
@@ -46,6 +48,7 @@ const mockTasks: Task[] = [
     date: format(new Date(), "yyyy-MM-dd"),
     time: "15:00",
     completed: false,
+    priority: "low",
     createdAt: new Date(),
     updatedAt: new Date(),
   },
@@ -57,14 +60,35 @@ function loadTasksFromStorage(): Task[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return mockTasks;
-    const parsed = JSON.parse(raw);
+    const parsed = JSON.parse(raw) as unknown;
     if (!Array.isArray(parsed)) return mockTasks;
-    return parsed.map((t: any) => ({
-      ...t,
-      createdAt: t.createdAt ? new Date(t.createdAt) : new Date(),
-      updatedAt: t.updatedAt ? new Date(t.updatedAt) : new Date(),
-    }));
+    return (parsed as Array<Partial<Task>>).map((t, i) => {
+      const id = t.id ? String(t.id) : `${Date.now()}_${i}`;
+      const title = t.title ?? "Sin título";
+      const description = t.description ?? "";
+      const date = t.date ?? format(new Date(), "yyyy-MM-dd");
+      const time = t.time ?? "";
+      const completed = Boolean(t.completed);
+      const priority =
+        t.priority === "low" || t.priority === "high" || t.priority === "medium"
+          ? t.priority
+          : "medium";
+      const createdAt = t.createdAt ? new Date(t.createdAt) : new Date();
+      const updatedAt = t.updatedAt ? new Date(t.updatedAt) : new Date();
+      return {
+        id,
+        title,
+        description,
+        date,
+        time,
+        completed,
+        priority,
+        createdAt,
+        updatedAt,
+      } as Task;
+    });
   } catch {
+    // If parsing/storage fails, fallback to mock data
     return mockTasks;
   }
 }
@@ -81,7 +105,9 @@ export const useCalendar = () => {
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state.tasks));
-    } catch {}
+    } catch (e) {
+      console.warn("Failed to persist tasks", e);
+    }
   }, [state.tasks]);
 
   const navigateDate = (direction: "prev" | "next") => {
@@ -187,16 +213,20 @@ export const useCalendar = () => {
 
   const importTasksFromText = (text: string) => {
     try {
-      const parsed = JSON.parse(text);
+      const parsed = JSON.parse(text) as unknown;
       if (!Array.isArray(parsed)) return;
       // Basic normalization
-      const normalized: Task[] = parsed.map((t: any) => ({
-        id: t.id?.toString() ?? Date.now().toString(),
+      const normalized: Task[] = (parsed as Array<Partial<Task>>).map((t) => ({
+        id: t.id ? String(t.id) : Date.now().toString(),
         title: t.title ?? "Sin título",
         description: t.description ?? "",
         date: t.date ?? format(new Date(), "yyyy-MM-dd"),
         time: t.time ?? "",
         completed: Boolean(t.completed),
+        priority:
+          t.priority === "low" || t.priority === "high" || t.priority === "medium"
+            ? t.priority
+            : "medium",
         createdAt: t.createdAt ? new Date(t.createdAt) : new Date(),
         updatedAt: new Date(),
       }));

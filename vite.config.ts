@@ -17,5 +17,4 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  base: "https://jpaulmm1005.github.io/sweet-schedule-sparkle",
 }));

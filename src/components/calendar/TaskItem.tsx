@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { format } from 'date-fns';
 import { Clock, Edit3, Trash2 } from 'lucide-react';
-import { Task } from '@/types/calendar';
+import { Task, Priority } from '@/types/calendar';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface TaskItemProps {
   task: Task;
@@ -21,6 +23,7 @@ const TaskItem = ({ task, onToggle, onUpdate, onDelete, showDate = false }: Task
   const [editTitle, setEditTitle] = useState(task.title);
   const [editDescription, setEditDescription] = useState(task.description || '');
   const [editTime, setEditTime] = useState(task.time || '');
+  const [editPriority, setEditPriority] = useState<Priority>(task.priority ?? 'medium');
 
   const handleLongPress = () => {
     setIsEditing(true);
@@ -31,6 +34,7 @@ const TaskItem = ({ task, onToggle, onUpdate, onDelete, showDate = false }: Task
       title: editTitle,
       description: editDescription,
       time: editTime,
+      priority: editPriority,
     });
     setIsEditing(false);
   };
@@ -45,7 +49,8 @@ const TaskItem = ({ task, onToggle, onUpdate, onDelete, showDate = false }: Task
   return (
     <>
       <div
-        className={`group relative bg-white/60 backdrop-blur-sm rounded-2xl p-4 transition-all duration-300 cursor-pointer
+        className={`group relative h-full flex flex-col bg-white/60 backdrop-blur-sm rounded-2xl p-4 transition-all duration-300 cursor-pointer border-l-4
+          ${task.priority === 'high' ? 'border-l-rose-300' : task.priority === 'medium' ? 'border-l-amber-300' : 'border-l-emerald-300'}
           ${task.completed 
             ? 'opacity-60 bg-muted/30' 
             : 'hover:bg-white/80 hover:shadow-soft'
@@ -58,6 +63,7 @@ const TaskItem = ({ task, onToggle, onUpdate, onDelete, showDate = false }: Task
       >
         {/* Task Content */}
         <div className="flex items-start gap-3">
+
           {/* Checkbox */}
           <div 
             className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-smooth mt-0.5
@@ -73,35 +79,40 @@ const TaskItem = ({ task, onToggle, onUpdate, onDelete, showDate = false }: Task
 
           {/* Task Info */}
           <div className="flex-1 min-w-0">
-            <h3 className={`font-medium text-sm transition-smooth
+            <div className="flex items-center justify-between gap-2">
+              <h3 className={`font-medium text-sm transition-smooth
               ${task.completed ? 'line-through text-muted-foreground' : 'text-foreground'}
             `}>
-              {task.title}
-            </h3>
+                {task.title}
+              </h3>
+              <Badge
+                className={`${task.priority === 'high' ? 'bg-rose-200 text-rose-800' : task.priority === 'medium' ? 'bg-amber-200 text-amber-800' : 'bg-emerald-200 text-emerald-800'}`}
+              >
+                {task.priority === 'high' ? 'Alta' : task.priority === 'medium' ? 'Media' : 'Baja'}
+              </Badge>
+            </div>
             
             {task.description && (
-              <p className={`text-xs mt-1 transition-smooth
-                ${task.completed ? 'line-through text-muted-foreground/60' : 'text-muted-foreground'}
-              `}>
+              <p className="text-xs text-muted-foreground line-clamp-2">
                 {task.description}
               </p>
             )}
-
-            {/* Time and Date */}
-            <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
-              {task.time && (
-                <div className="flex items-center gap-1">
-                  <Clock className="w-3 h-3" />
-                  <span>{task.time}</span>
-                </div>
-              )}
-              {showDate && (
-                <span>{format(new Date(task.date), 'dd MMM')}</span>
-              )}
-            </div>
+            {task.time && (
+              <div className="mt-2 flex items-center gap-2 text-muted-foreground text-xs">
+                <div className={`w-2 h-2 rounded-full ${
+                  task.priority === 'high' ? 'bg-rose-300' : task.priority === 'medium' ? 'bg-amber-300' : 'bg-emerald-300'
+                }`} />
+                <span className="tabular-nums">{task.time}</span>
+              </div>
+            )}
           </div>
 
-          {/* Action Buttons (visible on hover) */}
+          {/* Time and Date */}
+          <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
+            {showDate && (
+              <span>{format(new Date(task.date), 'dd MMM')}</span>
+            )}
+          </div>
           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-smooth">
             <Button
               aria-label="Editar tarea"
@@ -173,6 +184,20 @@ const TaskItem = ({ task, onToggle, onUpdate, onDelete, showDate = false }: Task
               />
             </div>
 
+            <div>
+              <Label className="text-sm font-medium">Prioridad</Label>
+              <Select value={editPriority} onValueChange={(v) => setEditPriority(v as Priority)}>
+                <SelectTrigger className="mt-1 bg-white/50 border-border/50">
+                  <SelectValue placeholder="Selecciona prioridad" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="low">Baja</SelectItem>
+                  <SelectItem value="medium">Media</SelectItem>
+                  <SelectItem value="high">Alta</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             <div className="flex gap-3 pt-4">
               <Button
                 variant="outline"
@@ -186,16 +211,6 @@ const TaskItem = ({ task, onToggle, onUpdate, onDelete, showDate = false }: Task
                 className="flex-1 bg-primary hover:bg-primary/90"
               >
                 Guardar
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={() => {
-                  onDelete(task.id);
-                  setIsEditing(false);
-                }}
-                className="bg-destructive hover:bg-destructive/90"
-              >
-                Eliminar
               </Button>
             </div>
           </div>

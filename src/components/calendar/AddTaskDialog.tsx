@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Task } from '@/types/calendar';
+import { Task, Priority } from '@/types/calendar';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface AddTaskDialogProps {
   open: boolean;
@@ -18,6 +19,7 @@ const AddTaskDialog = ({ open, onOpenChange, selectedDate, onAddTask }: AddTaskD
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [time, setTime] = useState('');
+  const [priority, setPriority] = useState<Priority>('medium');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,12 +32,14 @@ const AddTaskDialog = ({ open, onOpenChange, selectedDate, onAddTask }: AddTaskD
       date: format(selectedDate, 'yyyy-MM-dd'),
       time: time || undefined,
       completed: false,
+      priority,
     });
 
     // Reset form
     setTitle('');
     setDescription('');
     setTime('');
+    setPriority('medium');
     onOpenChange(false);
   };
 
@@ -43,6 +47,7 @@ const AddTaskDialog = ({ open, onOpenChange, selectedDate, onAddTask }: AddTaskD
     setTitle('');
     setDescription('');
     setTime('');
+    setPriority('medium');
     onOpenChange(false);
   };
 
@@ -87,6 +92,20 @@ const AddTaskDialog = ({ open, onOpenChange, selectedDate, onAddTask }: AddTaskD
               onChange={(e) => setTime(e.target.value)}
               className="bg-white/50 border-border/50"
             />
+          </div>
+
+          <div>
+            <Label className="text-sm font-medium">Prioridad</Label>
+            <Select value={priority} onValueChange={(v) => setPriority(v as Priority)}>
+              <SelectTrigger className="mt-1 bg-white/50 border-border/50">
+                <SelectValue placeholder="Selecciona prioridad" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="low">Baja</SelectItem>
+                <SelectItem value="medium">Media</SelectItem>
+                <SelectItem value="high">Alta</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="text-sm text-muted-foreground">

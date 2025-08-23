@@ -97,7 +97,7 @@ export const useCalendar = () => {
   const [state, setState] = useState<CalendarState>({
     currentDate: new Date(),
     selectedDate: new Date(),
-    view: "day",
+    view: "year",
     tasks: loadTasksFromStorage(),
   });
 
@@ -224,7 +224,9 @@ export const useCalendar = () => {
         time: t.time ?? "",
         completed: Boolean(t.completed),
         priority:
-          t.priority === "low" || t.priority === "high" || t.priority === "medium"
+          t.priority === "low" ||
+          t.priority === "high" ||
+          t.priority === "medium"
             ? t.priority
             : "medium",
         createdAt: t.createdAt ? new Date(t.createdAt) : new Date(),

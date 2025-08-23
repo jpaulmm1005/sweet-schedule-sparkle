@@ -118,7 +118,7 @@ const CalendarHeader = ({
           <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
         </Button>
 
-        <h1 className="text-lg sm:text-xl lg:text-2xl font-semibold text-foreground capitalize text-center px-2">
+        <h1 className="text-lg sm:text-xl lg:text-2xl font-semibold text-foreground capitalize text-center px-2 min-w-0 flex-1">
           {getFormattedDate()}
         </h1>
 
@@ -134,11 +134,13 @@ const CalendarHeader = ({
       </div>
 
       {/* View Toggle */}
-      <TabsWithIndicator
-        view={view}
-        onViewChange={onViewChange}
-        viewButtons={viewButtons}
-      />
+      <div className="flex justify-center">
+        <TabsWithIndicator
+          view={view}
+          onViewChange={onViewChange}
+          viewButtons={viewButtons}
+        />
+      </div>
     </div>
   );
 };
@@ -192,7 +194,7 @@ const TabsWithIndicator = ({ view, onViewChange, viewButtons }: TabsProps) => {
   return (
     <div
       ref={wrapRef}
-      className="relative flex justify-center bg-white/50 rounded-full p-1 gap-1 w-fit"
+      className="relative flex bg-white/50 rounded-full p-1 gap-1 w-full sm:w-fit max-w-sm"
     >
       {pos && (
         <div
@@ -215,7 +217,7 @@ const TabsWithIndicator = ({ view, onViewChange, viewButtons }: TabsProps) => {
           variant="ghost"
           size="sm"
           onClick={() => onViewChange(key)}
-          className={`relative z-10 rounded-full text-xs sm:text-sm font-medium transition-smooth active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 px-3 sm:px-4 py-1.5 sm:py-2 ${
+          className={`relative z-10 rounded-full text-xs sm:text-sm font-medium transition-smooth active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 px-3 sm:px-4 py-1.5 sm:py-2 flex-1 sm:flex-initial ${
             view === key
               ? "text-white hover:text-white hover:bg-transparent"
               : "hover:bg-white/60 text-muted-foreground hover:text-muted-foreground"

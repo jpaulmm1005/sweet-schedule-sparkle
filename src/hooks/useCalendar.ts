@@ -97,7 +97,7 @@ export const useCalendar = () => {
   const [state, setState] = useState<CalendarState>({
     currentDate: new Date(),
     selectedDate: new Date(),
-    view: "day",
+    view: "year",
     tasks: loadTasksFromStorage(),
   });
 

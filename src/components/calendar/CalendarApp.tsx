@@ -9,6 +9,7 @@ import AddTaskDialog from "./AddTaskDialog";
 import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Upload, Download } from "lucide-react";
+import QuickDaysScroller from "./QuickDaysScroller";
 
 const CalendarApp = () => {
   const [showAddTask, setShowAddTask] = useState(false);
@@ -142,12 +143,10 @@ const CalendarApp = () => {
                   <h4 className="text-sm font-semibold text-foreground mb-3">
                     Vista Rápida
                   </h4>
-                  <WeekView
-                    weekDays={weekDays}
+                  <QuickDaysScroller
                     selectedDate={selectedDate}
                     onSelectDate={selectDate}
                     getTasksForDate={getTasksForDate}
-                    compact
                   />
                 </div>
 
@@ -202,12 +201,10 @@ const CalendarApp = () => {
                     <h4 className="text-sm font-semibold text-foreground mb-3">
                       Vista Rápida
                     </h4>
-                    <WeekView
-                      weekDays={weekDays}
+                    <QuickDaysScroller
                       selectedDate={selectedDate}
                       onSelectDate={selectDate}
                       getTasksForDate={getTasksForDate}
-                      compact
                     />
                   </div>
 
